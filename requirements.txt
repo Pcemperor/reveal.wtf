@@ -1,7 +1,6 @@
-django
+Django==5.2.3
 django-environ=0.10.0
-cryptography
-solana
-solders
-base58
-requests
+python-decouple==3.8
+cryptography==41.0.7
+psycopg2==2.9.7
+pillow==10.0.1
