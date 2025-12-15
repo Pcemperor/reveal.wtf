@@ -1,0 +1,69 @@
+
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
+        <div class="container">
+            <!-- Logo -->
+            <a class="navbar-brand fw-bold" href="{% url 'home' %}">
+                reveal.wtf
+            </a>
+                          <!--search area-->
+
+<div class="d-none d-md-flex mx-4 flex-grow-1" style="max-width: 400px;">
+    <form method="get" action="{% url 'search_results' %}" class="w-100">
+        <div class="input-group">
+            <input type="text" 
+                   name="q" 
+                   class="form-control bg-dark border-secondary text-light" 
+                   placeholder="Search creators..."
+                   aria-label="Search">
+            <button class="btn btn-outline-secondary" type="submit">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </form>
+</div>
+
+
+
+            <!-- Wallet & Create Drop Buttons -->
+            <div class="d-flex align-items-center gap-3">
+                <!-- Create Drop Button (shown when wallet connected-->
+                 {% if request.path == '/' %}
+                <a href="{% url 'create_drop' %}" class="btn btn-outline-primary d-none" id="create-drop-btn">
+                    Create Drop
+                </a>
+                {% endif %}
+
+                
+        <!--navigation links-->
+    <a href="{% url 'setup_profile' %}" class="btn btn-outline-warning d-none" id="setup-profile-btn">
+        <i class="fas fa-id-card me-1">Setup Profile</i>
+
+    </a>
+                    
+                               <!--search button for mobile drop dropdown-->
+                               <div class="d-md-none me-2">
+                                <a href="{% url 'search_results' %}" class="btn btn-outline-secondary">
+                                 <i class="fas fa-search"></i>
+                                </a>
+                            </div>
+
+
+
+
+                 <!-- Wallet Connect Button -->
+                <div class="dropdown">
+                <button class="btn dropdown-toggle" id="wallet-connect-btn" data-bs-toggle="dropdown" aria-expanded="false" style="border: 1px solid #374151;">
+                    Connect Wallet
+                </button>
+                <ul class="dropdown-menu dropdown-menu-dark">
+             <li><a class="dropdown-item connect-option" href="#" onclick="connectPhantom()">Phantom</a></li>
+
+             <li><a href="#" class="dropdown-item disconnect-option d-none text-danger" onclick="disconnectWallet()">Disconnect</a></li>
+             </ul>
+            </div>
+        </div>
+    </div>
+    </nav>
+</header>
+

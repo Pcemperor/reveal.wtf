@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold">Setup Your Profile</h1>
+                <p class="text-muted">Claim your identity on reveal.wtf</p>
+            </div>
+
+            <!-- Profile Form Card -->
+            <div class="soft-card p-4 p-md-5">
+                <form method="post" class="needs-validation" novalidate action="{% url 'setup_profile' %}">
+                    {% csrf_token %}
+                    
+                    <!-- Username (Required) -->
+                    <div class="mb-4">
+                        <label for="{{ form.username.id_for_label }}" class="form-label fw-semibold">
+                            Username <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group pl-3">
+                            <span class="input-group-text bg-dark border-secondary text-muted">@</span>
+                            {{ form.username }}
+                        </div>
+                        <div class="form-text">This will be your unique identity. Cannot be changed later.</div>
+                        {% if form.username.errors %}
+                        <div class="text-danger small mt-1">{{ form.username.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Bio -->
+                    <div class="mb-4">
+                        <label for="{{ form.bio.id_for_label }}" class="form-label fw-semibold">Bio</label><br>
+                        {{ form.bio }}
+                        <div class="form-text">Tell collectors about your art style and story</div>
+                    </div>
+
+                    <!-- Social Links Header -->
+                    <div class="mb-3">
+                        <h6 class="fw-semibold border-bottom border-secondary pb-2">Social Links (Optional)</h6>
+                        <p class="text-muted small">Connect your accounts for verification</p>
+                    </div>
+
+                    <!-- Twitter -->
+                    <div class="mb-3">
+                        <label for="{{ form.twitter_handle.id_for_label }}" class="form-label">
+                            <i class="fab fa-twitter text-primary me-2"></i>Twitter
+                        </label>
+                        
+                            {{ form.twitter_handle }}
+                        
+                    </div>
+
+                    <!-- Discord -->
+                    <div class="mb-3">
+                        <label for="{{ form.discord_handle.id_for_label }}" class="form-label">
+                            <i class="fab fa-discord text-indigo me-2"></i>Discord
+                        </label>
+                        {{ form.discord_handle }}
+                    </div>
+
+                    <!-- Website -->
+                    <div class="mb-4">
+                        <label for="{{ form.website_url.id_for_label }}" class="form-label">
+                            <i class="fas fa-globe text-success me-2"></i>Website
+                        </label>
+                        {{ form.website_url }}
+                    </div>
+
+                    <!-- Wallet Address (Read-only) -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Connected Wallet</label>
+                        <div class="input-group">
+                            <input type="text" 
+                                   value="{{ user.wallet_address }}" 
+                                   class="form-control bg-dark text-muted" 
+                                   readonly
+                                   style="font-family: monospace;">
+                            <button type="button" class="btn btn-outline-secondary" onclick="copyWalletAddress()">
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg py-3 fw-semibold">
+                            Save Profile
+                        </button>
+                        <a href="{% url 'home' %}" class="btn btn-outline-light">
+                            Skip for now
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyWalletAddress() {
+    const wallet = "{{ user.wallet_address }}";
+    navigator.clipboard.writeText(wallet).then(() => {
+        alert('Wallet address copied!');
+    });
+}
+
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    }, false);
+});
+
+document.querySelector('form').addEventListener('submit', function(e){
+    if (this.checkValidity()){
+        const submitBtn = this.querySelector('button[type="submit"]');
+        LoadingState.show(submitBtn, 'Saving Profile...');
+    }
+});
+</script>
+
+<style>
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .soft-card {
+        margin: 0 -15px;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+    
+    .input-group-text {
+        min-width: 40px;
+    }
+}
+
+/* Focus styles */
+.form-control:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+}
+
+/* Social icon colors */
+.fa-twitter { color: #1DA1F2; }
+.fa-discord { color: #5865F2; }
+.fa-globe { color: #10B981; }
+</style>
+{% endblock %}

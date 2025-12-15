@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold">Create Secret Drop</h1>
+                <p class="text-muted">Upload your art, set a price, and let the mystery unfold</p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="soft-card p-4 p-md-5">
+                                {% if success_message %}
+                                    <div class="alert alert-success">{{ success_message }}</div>
+                                {% endif %}
+                                {% if error_message %}
+                                    <div class="alert alert-danger">{{ error_message }}</div>
+                                {% endif %}
+                                {% if form.errors %}
+                                    <div class="alert alert-danger">
+                                        {{ form.errors }}
+                                    </div>
+                                {% endif %}
+                <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Title -->
+                    <div class="mb-4">
+                        <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">Drop Title</label><br>
+                        {{ form.title }}
+                        <div class="form-text">Give your secret drop an intriguing name</div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <label for="{{ form.description.id_for_label }}" class="form-label fw-semibold">Description</label> <br>
+                        {{ form.description }}
+                        <div class="form-text">Tease what might be hidden without giving it away</div>
+                    </div>
+
+                    <!-- Image Upload -->
+                    <div class="mb-4">
+                        <label for="{{original_image}}" class="form-label fw-semibold">Secret Art</label>
+                        <div class="file-upload-area border border-dashed border-secondary rounded-3 p-4 text-center">
+                            {{ form.original_image }}
+                            <div class="mt-2">
+                                <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                                <p class="text-muted mb-1">Drag & drop or click to upload</p>
+                                <small class="text-muted">PNG, JPG, GIF up to 10MB</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Price & Supply Row -->
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.price_sol.id_for_label }}" class="form-label fw-semibold">Price (SOL)</label> <br>
+                            {{ form.price_sol }}
+                            <div class="form-text">Set the reveal price</div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label for="{{ form.total_supply.id_for_label }}" class="form-label fw-semibold">Total Supply</label> <br>
+                            {{ form.total_supply }}
+                            <div class="form-text">How many can be revealed</div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg py-3 fw-semibold">
+                            Create Secret Drop
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        const form = document.querySelector('form');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        
+        form.addEventListener('submit', function(e){
+            if (form.checkValidity()) {
+                LoadingState.show(submitBtn, 'Creating Drop...');
+                LoadingState.showGlobal();
+            }
+        });
+
+    });
+
+    //show loading when form is valid 
+    document.querySelector('form').addEventListener('submit', function(){
+        if (this.checkValidity()){
+            LoadingState.showGlobal();
+        }
+    })
+</script>
+{% endblock %}
+
+
+

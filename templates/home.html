@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-5">Secret Drops</h1>
+    
+    <div class="row">
+        {% for drop in drops %}
+        <div class="col-md-4 mb-4">
+            <div class="soft-card p-3">
+                <!-- Black Box Image -->
+                <img src="{% static 'images/blackbox.png' %}" class="card-img-top rounded-3" alt="Secret Drop" style="height: 300px; object-fit: cover;">
+                
+                <div class="card-body">
+                    <h5 class="card-title">{{ drop.title }}</h5>
+
+                <small class="text-muted d-block mb-2">
+                    <i class="fas fa-user me-1"></i>
+                    {% with drop.get_creator_username as username %}
+                      {% if username %}
+                        @{{ username }}
+
+                    {% else %}
+                        {{ drop.creator|slice:":8" }}...
+                    {% endif %}
+                 {% endwith %}
+
+
+                </small>
+
+
+                    <p class="text-muted">{{ drop.description|truncatewords:20 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="h5 mb-0">{{ drop.price_sol }} SOL</span>
+                        <a href="{% url 'purchase_drop' drop.id %}" class="btn btn-primary">
+                           Reveal for {{ drop.price_sol }} SOL.
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">No secret drops yet. Be the first to create one!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

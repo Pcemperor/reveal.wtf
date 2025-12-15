@@ -1,0 +1,60 @@
+{% load static %}
+{% load core_extras %}
+
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>reveal.wtf - Secret Drops</title>
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Our custom dark theme -->
+    <link href="{% static 'css/custom/dark-theme.css' %}" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<style>
+    body{
+        font-size: larger;
+        font-weight: 600;
+    }
+</style>
+<body class="bg-dark text-light">
+    {% csrf_token %}
+
+    <!-- Header -->
+    {% include 'includes/header.html' %}
+    {% include 'includes/wallet_modal.html' %}
+    
+    <!-- Main Content -->
+    <main class="container-fluid py-4">
+        {% block content %}
+        <!-- Child templates insert their content here -->
+        {% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    {% include 'includes/footer.html' %}
+    
+    <!-- Bootstrap JS -->
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+
+
+        <!-- Buffer polyfill for browser (required by solana-web3.js) -->
+      <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
+        <script>
+            window.Buffer = buffer.Buffer;
+        </script>
+
+        <!--solana web3-->
+  
+    <!-- custom JS -->
+      <script src="{% static 'js/wallet_connector.js' %}"></script>
+      <script src="{% static 'js/app.js' %}"></script>
+    <!-- Additional JS blocks for child templates -->
+    {% block extra_js %}
+    {% endblock %}
+
+
+</body>
+</html>
