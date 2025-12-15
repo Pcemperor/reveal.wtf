@@ -1,7 +1,0 @@
-django
-django-environ=0.10.0
-cryptography
-solana
-solders
-base58
-requests
