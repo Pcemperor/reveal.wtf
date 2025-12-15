@@ -5,6 +5,7 @@ class WalletConnector {
         this.walletAddress = null;
         this.checkExistingConnection();
         this.restoreConnection();
+        setTimeout(updateDropdownUI, 100);
     }
 
 
@@ -88,7 +89,8 @@ class WalletConnector {
     }
      // register wallet with django session
     async registerWithBackend(walletAddress) {
-        const response = await fetch('/api/wallet_login/', {
+        try{
+            const response = await fetch('/api/wallet_login/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -98,14 +100,17 @@ class WalletConnector {
         });
         if (response.ok) {
             console.log('Wallet registered with backend successfully.');
+            //refrsh page to update header with profile status
+            setTimeout(()=> location.reload(), 500);
             }
+        } catch (error){
+            console.log('Backend regisgtration error:', error);
+        }
+        
     }
     // get CSRF token from django 
     getCSRFToken() {return document.querySelector('[name=csrfmiddlewaretoken]').value;}
-
-
-
-
+ nb
     // connect to Solflare
     async connectSolflare() {
         try {
@@ -126,11 +131,17 @@ class WalletConnector {
     }
 
     // update UI after connect
-    updateWalletUI() {
+    async updateWalletUI() {
         const btn = document.getElementById('wallet-connect-btn');
         const createDropbtn = document.getElementById('create-drop-btn');
-        if (!btn) return;
+        const setupProfileBtn = document.getElementById('setup-profile-btn');
+    
 
+     
+        if (!btn) {
+            console.error('Wallet connect button not found');
+            return
+        };
         if (this.walletAddress) {
             const a = this.walletAddress;
             const short = a.slice(0, 4) + '...' + a.slice(-4);
@@ -138,18 +149,52 @@ class WalletConnector {
             btn.classList.remove('btn-outline-light');
             btn.classList.remove('btn-secondary');
             btn.classList.add('btn-success');
-            if (createDropbtn) {
-                createDropbtn.classList.remove('d-none');
-            }
+                    //to know if user has a profile
+            const hasProfile = await this.checkUserProfile();
+            console.log('User has profile:', hasProfile);
+      
+       if(hasProfile){
+       //if has username, show createdrop & hide setup
+       if (createDropbtn){
+        createDropbtn.classList.remove('d-none');
+       }
+       if (setupProfileBtn){
+        setupProfileBtn.classList.add('d-none')
+       }
+       } else{
+        if (createDropbtn){
+            createDropbtn.classList.add('d-none');
+        }
+        if (setupProfileBtn){
+            setupProfileBtn.classList.remove('d-none')
+        }
+       }
+       
+
+         //   if (createDropbtn) {
+           //     createDropbtn.classList.remove('d-none');
+            //}
         } else {
             btn.textContent = 'Connect Wallet';
             btn.classList.remove('btn-success');
             btn.classList.add('btn-outline-light');
-            if (createDropbtn) {
-                createDropbtn.classList.add('d-none');
-            }
+
+            if (createDropbtn) createDropbtn.classList.add('d-none');
+            if(setupProfileBtn) setupProfileBtn.classList.add('d-none')    
+            
         }
     }
+ async checkUserProfile(){
+    try{
+        const response = await fetch(`/api/user/has-profile/?wallet=${this.walletAddress}`);
+        const data = await response.json();
+        console.log('Profile check response:', data);
+        return data.has_profile;
+    }catch (error) {
+        console.log('Error checking profile: ', error);
+        return false;
+    }
+ }
 
     // hide modal safely
     hideModal() {
@@ -157,6 +202,21 @@ class WalletConnector {
         if (!modalEl) return;
         const modal = bootstrap.Modal.getInstance(modalEl) || bootstrap.Modal.getOrCreateInstance(modalEl);
         modal.hide();
+    }
+
+    //disconnect wallet buttons
+    disconnectWallet() {
+        //clear local storgae
+        localStorage.removeItem('walletAddress');
+
+        //reset wallet
+        this.walletAddress = null;
+        this.provider =null;
+
+        //update ui
+        this.updateWalletUI();
+
+        console.log('Wallet Disconnected')
     }
 }
 
@@ -180,3 +240,26 @@ window.connectPhantom = connectPhantom;
 window.connectSolflare = connectSolflare;
 // Make walletConnector globally available for all pages
 window.walletConnector = wallet;
+
+function disconnectWallet() {
+    if (window.walletConnector) {
+        window.walletConnector.disconnectWallet();
+        //update dropdown ui
+        updateWalletUI()
+    }
+}
+
+function updateDropdownUI(){
+    const connectOptions = document.querySelectorAll('.connect-option');
+    const disconnectOption = document.querySelector('.disconnect-option');
+
+    if (window.walletConnector && window.walletConnector.walletAddress){
+        // show disconnect when connected
+        connectOptions.forEach(opt => opt.classList.add('d-none'));
+        disconnectOption.classList.remove('d-none')
+    } else{
+        //show connect when disconnected
+        connectOptions.forEach(opt => opt.classList.remove('d-none'));
+        disconnectOption.classList.add('d-none');
+    }
+}
