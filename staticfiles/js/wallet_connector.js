@@ -54,6 +54,24 @@ class WalletConnector {
 
     // connect to Phantom
     async connectPhantom() {
+      
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        if (isMobile) {
+            const phantomDeeplink = `phantom://wc?uri=${encodeURIComponent(window.location.href)}`;
+            window.location.href = phantomDeeplink;
+
+        setTimeout(() => {
+            if (document.hasFocus()) {
+                const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+                const storeURL = isIOS
+                    ? 'https://apps.apple.com/app/phantom-solana-wallet/id1598432977'
+                    : 'https://play.google.com/store/apps/details?id=com.phantom.app';
+                window.location.href = storeURL;
+            }
+        }, 2000);
+
+        return;
+      }
         try {
             if (!window.solana || !window.solana.isPhantom) {
                 alert('Phantom wallet not found! Please install Phantom.');
